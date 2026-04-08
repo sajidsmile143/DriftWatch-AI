@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+.env*
+.DS_Store
+*.log
+implementation_plan.md
+task.md
+walkthrough.md
