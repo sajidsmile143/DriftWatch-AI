@@ -72,9 +72,12 @@ export async function GET() {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const project = await ensureUserAndProject(user);
+    const isAdmin = user.email === 'sajidsmile143@gmail.com';
+    
     return NextResponse.json({
       ...(project.settings || {}),
-      apiKey: project.apiKey
+      apiKey: project.apiKey,
+      isAdmin: isAdmin
     });
   } catch (error) {
     console.error("Settings GET Error:", error);

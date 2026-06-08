@@ -33,6 +33,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ show: boolean, message: string } | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (toast?.show) {
@@ -53,6 +54,7 @@ export default function SettingsPage() {
           telegramToken: data.telegramToken || "",
           monitoringEnabled: data.monitoringEnabled ?? true
         });
+        setIsAdmin(data.isAdmin || false);
         setLoading(false);
       });
   }, []);
@@ -133,7 +135,7 @@ export default function SettingsPage() {
               </div>
             </motion.section>
 
-            <WhatsAppBridge defaultPhone={settings.whatsappNumber} />
+            {isAdmin && <WhatsAppBridge defaultPhone={settings.whatsappNumber} />}
 
 
 
