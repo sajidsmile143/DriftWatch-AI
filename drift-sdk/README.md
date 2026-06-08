@@ -18,7 +18,7 @@
 ## 📦 Installation
 
 ```bash
-npm install @sajidbhatti/driftly
+npm install @msajidbhatti/driftly
 ```
 
 ---
@@ -28,7 +28,7 @@ npm install @sajidbhatti/driftly
 Initialize the SDK at the root of your application (e.g., `_app.tsx` or `layout.tsx`).
 
 ```typescript
-import { initDriftly } from '@sajidbhatti/driftly';
+import { initDriftly } from '@msajidbhatti/driftly';
 
 initDriftly({
   monitorUrl: 'https://your-driftly-dashboard.com/api/monitor',

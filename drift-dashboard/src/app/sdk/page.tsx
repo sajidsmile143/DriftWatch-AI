@@ -22,7 +22,7 @@ export default function SDKPage() {
   }, []);
 
   const codeSnippet = `// 1. Initialize Driftly in your App entry point (e.g., layout.tsx)
-import { initDriftly } from "@sajidbhatti/driftly";
+import { initDriftly } from "@msajidbhatti/driftly";
 
 initDriftly({
   monitorUrl: "${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/api/monitor",
@@ -62,14 +62,14 @@ initDriftly({
               </div>
               <div 
                 onClick={() => {
-                  navigator.clipboard.writeText("npm install @sajidbhatti/driftly");
+                  navigator.clipboard.writeText("npm install @msajidbhatti/driftly");
                   setInstallCopied(true);
                   setTimeout(() => setInstallCopied(false), 2000);
                 }}
                 className="p-6 bg-white/[0.03] backdrop-blur-3xl border border-white/5 rounded-[2rem] font-mono text-sm flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all"
               >
                 <span className="text-white/60">
-                  <span className="text-primary font-bold">npm install</span> @sajidbhatti/driftly
+                  <span className="text-primary font-bold">npm install</span> @msajidbhatti/driftly
                 </span>
                 <div className="p-2 bg-white/5 rounded-lg opacity-50 group-hover:opacity-100 transition-all">
                   {installCopied ? (

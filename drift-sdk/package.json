@@ -1,5 +1,5 @@
 {
-  "name": "@sajidbhatti/driftly",
+  "name": "@msajidbhatti/driftly",
   "version": "1.0.0",
   "description": "Real-time API Drift Detection & Monitoring for Frontend applications. (Driftly)",
   "main": "dist/index.js",
