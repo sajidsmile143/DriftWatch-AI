@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardHeader } from "../../components/DashboardHeader";
 import { 
-  AlertCircle, 
   ShieldAlert, 
   BrainCircuit, 
   History, 
-  ChevronRight,
   Info,
   Bug,
   LayoutTemplate
@@ -16,6 +14,7 @@ import {
 import { cn } from "../../lib/utils";
 import type { DriftReport } from "../../lib/store";
 import { explainDriftImpact } from "../../lib/ai-explainer";
+import { supabase } from "../../lib/supabase";
 
 export default function DriftsPage() {
   const [reports, setReports] = useState<DriftReport[]>([]);
@@ -32,23 +31,47 @@ export default function DriftsPage() {
         ]);
         const reportsData = await monitorRes.json();
         const settingsData = await settingsRes.json();
-        setReports(reportsData);
+        
+        setReports(Array.isArray(reportsData) ? reportsData : []);
         setSettings(settingsData);
       } catch (err) {
         console.error("Error loading drifts data:", err);
+        setReports([]);
       } finally {
         setLoading(false);
       }
     }
     loadData();
+
+    // 🚀 Real-time Subscription
+    const channel = supabase
+      .channel('realtime-drifts')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'Report',
+        },
+        (payload) => {
+          console.log('📡 New drift received via orbit:', payload.new);
+          setReports(prev => [payload.new as any, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
+
 
   const handleAIAnalyze = async (report: DriftReport) => {
     setAiAnalysis(prev => ({ ...prev, [report.id]: { result: "", loading: true } }));
     
     const analysis = await explainDriftImpact(
       report.serviceName, 
-      report.diff, 
+      report.diff as any, 
       settings?.geminiApiKey
     );
 
@@ -93,7 +116,7 @@ export default function DriftsPage() {
             </div>
             <h3 className="text-2xl font-bold">Systems Stable</h3>
             <p className="text-muted-foreground max-w-sm mx-auto mt-2 text-sm leading-relaxed">
-              DriftWatch is currently in orbit. No API schema changes detected across your microservices.
+              Driftly is currently in orbit. No API schema changes detected across your microservices.
             </p>
           </motion.div>
         ) : (
@@ -106,14 +129,12 @@ export default function DriftsPage() {
                 transition={{ delay: i * 0.1 }}
                 className="group relative"
               >
-                {/* Visual Connector / Accent */}
                 <div className={cn(
                   "absolute -left-4 top-0 bottom-0 w-1.5 rounded-full blur-sm",
                   report.type === "BREAKING" ? "bg-destructive/50" : "bg-orange-500/50"
                 )} />
 
                 <div className="p-8 bg-white/[0.03] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] hover:border-white/10 transition-all duration-500 shadow-2xl">
-                  {/* Header */}
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
                     <div className="flex items-start gap-4">
                       <div className={cn(
@@ -142,7 +163,7 @@ export default function DriftsPage() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">{new Date(report.timestamp).toLocaleString()}</span>
+                      <span className="text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">{new Date(Number(report.timestamp)).toLocaleString()}</span>
                       <button 
                         onClick={() => handleAIAnalyze(report)}
                         disabled={aiAnalysis[report.id]?.loading}
@@ -158,7 +179,6 @@ export default function DriftsPage() {
                     </div>
                   </div>
 
-                  {/* AI Result Area */}
                   <AnimatePresence>
                     {aiAnalysis[report.id]?.result && (
                       <motion.div 
@@ -176,7 +196,9 @@ export default function DriftsPage() {
                                <Info className="w-4 h-4 text-primary" />
                              </div>
                              <div className="space-y-2">
-                               <h5 className="text-xs font-bold text-primary uppercase tracking-widest">Orbital AI Insights</h5>
+                               <h5 className="text-xs font-bold text-primary uppercase tracking-widest">
+                                 {aiAnalysis[report.id].result.startsWith("🛡️") ? "Internal Smart Audit" : "✨ Gemini AI Insight"}
+                               </h5>
                                <p className="text-sm text-primary/90 leading-relaxed italic pr-12">
                                  &ldquo;{aiAnalysis[report.id].result}&rdquo;
                                </p>
@@ -187,21 +209,27 @@ export default function DriftsPage() {
                     )}
                   </AnimatePresence>
 
-                  {/* Diff Visualizer - Premium Side by Side */}
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-4">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between px-2">
-                         <span className="text-[10px] uppercase tracking-widest font-black text-muted-foreground">Baseline Schema</span>
+                      <div className="flex items-center gap-2 px-2">
                          <LayoutTemplate className="w-4 h-4 text-muted-foreground/20" />
+                         <span className="text-[10px] uppercase tracking-widest font-black text-muted-foreground">Baseline Schema</span>
                       </div>
-                      <div className="p-6 bg-[#0a0a0a] rounded-[2rem] border border-white/5 relative overflow-hidden">
-                        <div className="absolute top-3 right-3 text-[10px] text-emerald-500/50 font-bold border border-emerald-500/20 px-2 py-1 rounded">HEALTHY</div>
-                        <pre className="text-xs font-mono text-emerald-400/80 overflow-x-auto whitespace-pre-wrap">
-                          {Object.entries(report.diff.expected).map(([key, type]) => (
+                      <div className="rounded-[2rem] border border-white/5 bg-[#0a0a0a] overflow-hidden shadow-2xl">
+                        <div className="flex items-center justify-between px-6 py-3 border-b border-white/5 bg-white/[0.02]">
+                          <div className="flex gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-emerald-500/20" />
+                            <div className="w-2 h-2 rounded-full bg-emerald-500/20" />
+                            <div className="w-2 h-2 rounded-full bg-emerald-500/20" />
+                          </div>
+                          <span className="text-[9px] font-black text-emerald-500/50 uppercase tracking-widest">Expected</span>
+                        </div>
+                        <pre className="p-6 font-mono text-xs text-emerald-400/80 overflow-x-auto whitespace-pre-wrap">
+                          {Object.entries((report.diff as any)?.expected || {}).map(([key, type]) => (
                             <div key={key} className="flex gap-2 group/line">
                                <span className="text-white/20 select-none group-hover/line:text-white/40">{">"}</span>
                                <span className="text-white/60">{key}:</span>
-                               <span className="text-emerald-400 font-bold">{type}</span>
+                               <span className="text-emerald-400 font-bold">{String(type)}</span>
                             </div>
                           ))}
                         </pre>
@@ -209,53 +237,76 @@ export default function DriftsPage() {
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between px-2">
-                         <span className="text-[10px] uppercase tracking-widest font-black text-muted-foreground">Actual Payload Analysis</span>
+
+                      <div className="flex items-center gap-2 px-2">
                          <Bug className="w-4 h-4 text-muted-foreground/20" />
+                         <span className="text-[10px] uppercase tracking-widest font-black text-muted-foreground">Actual Payload Analysis</span>
                       </div>
                       <div className={cn(
-                        "p-6 rounded-[2rem] border border-white/5 relative overflow-hidden",
-                        report.type === "BREAKING" ? "bg-destructive/5" : "bg-orange-500/5"
+                        "rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl",
+                        report.type === "BREAKING" ? "bg-destructive/[0.02]" : "bg-orange-500/[0.02]"
                       )}>
                         <div className={cn(
-                          "absolute top-3 right-3 text-[10px] font-bold border px-2 py-1 rounded",
-                          report.type === "BREAKING" ? "text-destructive border-destructive/20" : "text-orange-500 border-orange-500/20"
-                        )}>{report.type === "BREAKING" ? "CRITICAL" : "CAUTION"}</div>
+                          "flex items-center justify-between px-6 py-3 border-b border-white/5",
+                          report.type === "BREAKING" ? "bg-destructive/5" : "bg-orange-500/5"
+                        )}>
+                          <div className="flex gap-1.5">
+                            <div className={cn("w-2 h-2 rounded-full", report.type === "BREAKING" ? "bg-destructive/20" : "bg-orange-500/20")} />
+                            <div className={cn("w-2 h-2 rounded-full", report.type === "BREAKING" ? "bg-destructive/20" : "bg-orange-500/20")} />
+                            <div className={cn("w-2 h-2 rounded-full", report.type === "BREAKING" ? "bg-destructive/20" : "bg-orange-500/20")} />
+                          </div>
+                          <span className={cn(
+                            "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border",
+                            report.type === "BREAKING" ? "text-destructive border-destructive/20" : "text-orange-500 border-orange-500/20"
+                          )}>
+                            {report.type === "BREAKING" ? "Critical Drift" : "Caution"}
+                          </span>
+                        </div>
                         
-                        <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap">
-                          {Object.entries(report.diff.actual).map(([key, type]) => {
-                            const isNew = !(key in report.diff.expected);
-                            const typeChanged = key in report.diff.expected && report.diff.expected[key] !== type;
-                            
+                        <pre className="p-6 font-mono text-xs overflow-x-auto whitespace-pre-wrap">
+                          {(() => {
+                            const diff = (report.diff || {}) as any;
+                            const current = diff.received || diff.actual || {};
+                            const expected = diff.expected || {};
+
                             return (
-                              <div key={key} className={cn(
-                                "flex gap-2 group/line px-2 -mx-2 rounded transition-colors",
-                                isNew ? "bg-emerald-500/10" : typeChanged ? "bg-destructive/10" : ""
-                              )}>
-                                 <span className="text-white/20 select-none">{typeChanged ? "!" : isNew ? "+" : ">"}</span>
-                                 <span className="text-white/60">{key}:</span>
-                                 <span className={cn(
-                                   "font-bold",
-                                   typeChanged ? "text-destructive" : isNew ? "text-emerald-400" : "text-white/40"
-                                 )}>{type}</span>
-                                 {typeChanged && <span className="text-[10px] text-destructive/50 italic ml-auto">expected {report.diff.expected[key]}</span>}
-                                 {isNew && <span className="text-[10px] text-emerald-500/50 italic ml-auto">new field</span>}
-                              </div>
+                              <>
+                                {Object.entries(current).map(([key, value]: [string, any]) => {
+                                  const isNew = !(key in expected);
+                                  const typeChanged = key in expected && typeof expected[key] !== typeof value;
+                                  
+                                  return (
+                                    <div key={key} className={cn(
+                                      "flex gap-2 group/line px-2 -mx-2 rounded transition-colors",
+                                      isNew ? "bg-emerald-500/10" : typeChanged ? "bg-destructive/10" : ""
+                                    )}>
+                                       <span className="text-white/20 select-none">{typeChanged ? "!" : isNew ? "+" : ">"}</span>
+                                       <span className="text-white/60">{key}:</span>
+                                       <span className={cn(
+                                          "font-bold",
+                                          typeChanged ? "text-destructive" : isNew ? "text-emerald-400" : "text-white/40"
+                                       )}> {String(value)}</span>
+                                       {typeChanged && <span className="text-[10px] text-destructive/50 italic ml-auto">expected {String(expected[key])}</span>}
+                                       {isNew && <span className="text-[10px] text-emerald-500/50 italic ml-auto">new field</span>}
+                                    </div>
+                                  );
+                                })}
+                                {Object.keys(expected).filter(k => !(k in current)).map(key => (
+                                  <div key={key} className="flex gap-2 bg-destructive/20 text-destructive px-2 -mx-2 rounded border border-destructive/20 mt-1">
+                                     <span className="text-destructive/50 select-none">x</span>
+                                     <span className="font-bold opacity-50 line-through truncate">{key}</span>
+                                     <span className="text-[10px] font-black uppercase ml-auto">REMOVED</span>
+                                  </div>
+                                ))}
+                              </>
                             );
-                          })}
-                          {/* Show missing keys */}
-                          {Object.keys(report.diff.expected).filter(k => !(k in report.diff.actual)).map(key => (
-                            <div key={key} className="flex gap-2 bg-destructive/20 text-destructive px-2 -mx-2 rounded border border-destructive/20 mt-1">
-                               <span className="text-destructive/50 select-none">x</span>
-                               <span className="font-bold opacity-50 line-through truncate">{key}</span>
-                               <span className="text-[10px] font-black uppercase ml-auto">REMOVED</span>
-                            </div>
-                          ))}
+                          })()}
                         </pre>
                       </div>
                     </div>
                   </div>
                 </div>
+
               </motion.div>
             ))}
           </div>

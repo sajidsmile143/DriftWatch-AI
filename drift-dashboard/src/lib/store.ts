@@ -15,10 +15,14 @@ export type DriftReport = {
   type: "BREAKING" | "WARNING" | "SAFE";
   message: string;
   diff: {
-    expected: Record<string, string>;
-    actual: Record<string, string>;
+    expected: Record<string, any>;
+    received?: Record<string, any>;
+    actual?: Record<string, any>;
+    added?: string[];
+    removed?: string[];
+    changed?: string[];
   };
-  timestamp: number;
+  timestamp: string | number;
 };
 
 export type Settings = {
@@ -36,7 +40,7 @@ class Store {
   private reports: DriftReport[] = [];
   private settings: Settings = { 
     monitoringEnabled: true,
-    geminiApiKey: "AIzaSyA7CBlihdC38UkrpS_Ao643lUMg950NbSI"
+    geminiApiKey: "AIzaSyATwa9a4TIAMKwAQWbrANNzC_KJvdQ7YLc"
   };
 
   private constructor() {}

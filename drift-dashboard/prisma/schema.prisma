@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Profile {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  fullName  String?
+  avatarUrl String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  id        String     @id @default(uuid())
+  name      String
+  userId    String
+  apiKey    String     @unique @default(uuid())
+  createdAt DateTime   @default(now())
+  baselines        Baseline[]
+  user             Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports          Report[]
+  settings         Settings?
+  whatsappSession  WhatsAppSession?
+}
+
+model Baseline {
+  id        String  @id @default(uuid())
+  projectId String
+  url       String
+  method    String
+  schema    Json
+  timestamp BigInt
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, url])
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  projectId   String
+  serviceName String
+  endpoint    String
+  type        String
+  message     String
+  diff        Json
+  timestamp   BigInt
+  createdAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id                String  @id @default(uuid())
+  projectId         String  @unique
+  whatsappNumber    String?
+  whatsappApiKey    String?
+  geminiApiKey      String?
+  slackWebhook      String?
+  telegramChatId    String?
+  telegramToken     String?
+  monitoringEnabled Boolean @default(true)
+  project           Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model WhatsAppSession {
+  id          String   @id @default(uuid())
+  projectId   String?  @unique
+  status      String   @default("DISCONNECTED") // DISCONNECTED, QR_READY, CONNECTED, AUTHENTICATING
+  qrCode      String?  // The raw QR string to display as an image
+  lastActive  DateTime @default(now())
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model NotificationQueue {
+  id        String   @id @default(uuid())
+  type      String   // WHATSAPP, SLACK, TELEGRAM
+  payload   Json     // { phone, message } or { webhook, text }
+  status    String   @default("PENDING") // PENDING, SENT, FAILED
+  error     String?
+  createdAt DateTime @default(now())
+  sentAt    DateTime?
+}

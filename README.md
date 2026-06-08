@@ -1,8 +1,8 @@
-# 🛡️ DriftWatch AI
+# 🛡️ Driftly AI
 
 **"The Microservices Killer" — Real-time API Drift Detection & Prevention.**
 
-Jab bare projects mein APIs change hoti hain, to frontend break ho jata hai aur kisi ko pata nahi chalta jab tak user report na kare. **DriftWatch AI** is problem ka jad se khatma karta hai.
+Jab bare projects mein APIs change hoti hain, to frontend break ho jata hai aur kisi ko pata nahi chalta jab tak user report na kare. **Driftly** is problem ka jad se khatma karta hai.
 
 Dashboard features:
 - **Zero-Day Crash Prevention**: Detects schema mismatches in real-time.
@@ -27,7 +27,7 @@ Visualize the exact difference between **Expected** vs **Actual** JSON schemas.
 Configure your phone number in the settings to receive instant alerts when a `BREAKING` drift is detected.
 
 ### 3. Live API Specification
-Forget manual documentation. DriftWatch captures live traffic and generates a documentation page for all your services with one-click Mocks.
+Forget manual documentation. Driftly captures live traffic and generates a documentation page for all your services with one-click Mocks.
 
 ---
 
@@ -36,27 +36,19 @@ Forget manual documentation. DriftWatch captures live traffic and generates a do
 ### 1. Installation
 
 ```bash
-cd drift-dashboard
-npm install
-npm run dev
+# Install the SDK
+npm install @sajidsmile/driftly
 ```
 
 ### 2. Basic Setup (SDK)
 
 ```javascript
-import { initDriftWatch } from "drift-sdk";
+import { initDriftly } from "@sajidsmile/driftly";
 
-initDriftWatch({
-  monitorUrl: "http://localhost:3000/api/monitor",
+initDriftly({
+  monitorUrl: "https://your-driftly-dashboard.vercel.app/api/monitor",
   serviceName: "My-Frontend-App"
 });
-```
-
-### 3. Trigger a Demo Drift
-
-Run the included test script to see the dashboard in action:
-```bash
-npx tsx test-drift.ts
 ```
 
 ---
@@ -65,10 +57,10 @@ npx tsx test-drift.ts
 
 - **Frontend/Dashboard**: Next.js 15 (App Router), Tailwind CSS v4, Framer Motion.
 - **SDK**: TypeScript Fetch Interceptor.
-- **AI**: Gemini/OpenAI Impact Analysis Engine.
+- **AI**: Gemini 1.5 Pro Impact Analysis Engine.
 - **Alerts**: WhatsApp Gateway Integration.
 
 ---
 
 ## 💖 Support the project
-If this tool saved your production app from a crash, give it a ⭐ on GitHub!
+If this tool saved your production app from a crash, give it a ⭐ on GitHub! (Driftly)

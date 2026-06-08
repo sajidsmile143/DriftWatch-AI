@@ -1,10 +1,11 @@
 /**
- * DriftWatch SDK
+ * Driftly SDK
  * Real-time API drift monitoring wrapper for fetch.
  */
 
 type DriftConfig = {
   monitorUrl: string;
+  apiKey: string; // The Project's unique identity key
   serviceName?: string;
   enabled?: boolean;
   debug?: boolean;
@@ -12,7 +13,7 @@ type DriftConfig = {
   onDrift?: (drift: any) => void;
 };
 
-export function initDriftWatch(config: DriftConfig) {
+export function initDriftly(config: DriftConfig) {
   // Ensure we only run in the browser and when enabled
   if (typeof window === "undefined" || config.enabled === false) return;
 
@@ -21,7 +22,7 @@ export function initDriftWatch(config: DriftConfig) {
   const serviceName = config.serviceName || "Frontend-App";
   const debug = config.debug || false;
 
-  if (debug) console.log("🛡️ DriftWatch initialized. Monitoring APIs...");
+  if (debug) console.log("🛡️ Driftly initialized. Monitoring APIs...");
 
   window.fetch = async (...args) => {
     try {
@@ -66,15 +67,18 @@ async function reportDrift(target: string, data: any, config: DriftConfig) {
   try {
     const res = await fetch(target, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "x-driftly-api-key": config.apiKey 
+      },
       body: JSON.stringify(data),
     });
     
     if (!res.ok) throw new Error(`Monitor responded with ${res.status}`);
 
     const result = await res.json();
-    if (result.status === "DRIFT_DETECTED") {
-      if (config.debug) console.warn("⚠️ [DriftWatch] API Drift Detected!", result.message);
+    if (result.status === "BREAKING" || result.status === "MODIFIED") {
+      if (config.debug) console.warn(`⚠️ [Driftly] ${result.status} Drift Detected!`, result.message);
       
       // Trigger custom callback if provided
       if (config.onDrift) config.onDrift(result);
@@ -84,6 +88,7 @@ async function reportDrift(target: string, data: any, config: DriftConfig) {
       window.dispatchEvent(event);
     }
   } catch (err) {
-    if (config.debug) console.error("[DriftWatch] Failed to report drift:", err);
+    if (config.debug) console.error("[Driftly] Failed to report drift:", err);
   }
+
 }

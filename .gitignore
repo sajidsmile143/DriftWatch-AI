@@ -9,3 +9,6 @@ dist/
 implementation_plan.md
 task.md
 walkthrough.md
+whatsapp_auth/
+.wwebjs_auth/
+.wwebjs_cache/

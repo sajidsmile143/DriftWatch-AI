@@ -32,10 +32,14 @@ export default function Home() {
         ]);
         const reportsData = await reportsRes.json();
         const servicesData = await servicesRes.json();
-        setReports(reportsData);
-        setServices(servicesData);
+        
+        // Robust array validation
+        setReports(Array.isArray(reportsData) ? reportsData : []);
+        setServices(Array.isArray(servicesData) ? servicesData : []);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
+        setReports([]);
+        setServices([]);
       } finally {
         setIsLoading(false);
       }
@@ -214,7 +218,7 @@ export default function Home() {
                           <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{report.message}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <Clock className="w-3 h-3 text-muted-foreground/30" />
-                            <span className="text-[10px] text-muted-foreground/50 italic capitalize">{new Date(report.timestamp).toLocaleTimeString()}</span>
+                            <span className="text-[10px] text-muted-foreground/50 italic capitalize">{new Date(Number(report.timestamp)).toLocaleTimeString()}</span>
                           </div>
                         </div>
                       </motion.div>

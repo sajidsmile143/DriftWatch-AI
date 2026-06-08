@@ -1,47 +1,44 @@
+import { prisma } from "./prisma";
+
 /**
- * Notifications Utility
- * Handles WhatsApp (via CallMeBot) and Slack (via Webhooks).
+ * notifyProject
+ * Queues a notification for a specific project based on its settings.
  */
-
-export async function sendWhatsAppDriftAlert(phone: string, apiKey: string, service: string, driftMessage: string) {
+export async function notifyProject(settings: any, serviceName: string, message: string) {
   try {
-    const text = encodeURIComponent(`⚠️ *DriftWatch Alert* ⚠️\n\n*Service:* ${service}\n*Status:* BREAKING\n*Drift:* ${driftMessage}\n\nCheck dashboard: http://localhost:3000/drifts`);
-    const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${text}&apikey=${apiKey}`;
-    const res = await fetch(url);
-    return res.ok;
-  } catch (error) {
-    console.error("WhatsApp Error:", error);
-    return false;
-  }
-}
+    const notifications = [];
 
-export async function sendSlackDriftAlert(webhookUrl: string, service: string, driftMessage: string) {
-  try {
-    const payload = {
-      text: `⚠️ *API Drift Detected*`,
-      attachments: [
-        {
-          color: "#ff0000",
-          title: `Service: ${service}`,
-          text: driftMessage,
-          fields: [
-            { title: "Status", value: "BREAKING", short: true },
-            { title: "Dashboard", value: "http://localhost:3000/drifts", short: true }
-          ],
-          footer: "DriftWatch AI",
-          ts: Math.floor(Date.now() / 1000)
-        }
-      ]
-    };
+    // 1. WhatsApp Notification
+    if (settings.whatsappNumber) {
+      notifications.push(
+        prisma.notificationQueue.create({
+          data: {
+            type: "WHATSAPP",
+            payload: {
+              phone: settings.whatsappNumber,
+              message: `🚨 *DRIFT ALERT: ${serviceName}* 🚨\n\n${message}\n\nCheck your dashboard for details.`,
+            },
+            status: "PENDING",
+          },
+        })
+      );
+    }
 
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    return res.ok;
+    // 2. Slack Notification (Stub for future)
+    if (settings.slackWebhook) {
+      console.log("Slack notification would be sent to:", settings.slackWebhook);
+    }
+
+    // 3. Telegram Notification (Stub for future)
+    if (settings.telegramToken && settings.telegramChatId) {
+      console.log("Telegram notification would be sent to:", settings.telegramChatId);
+    }
+
+    if (notifications.length > 0) {
+      await Promise.all(notifications);
+      console.log(`✅ Queued ${notifications.length} notifications for project ${settings.projectId}`);
+    }
   } catch (error) {
-    console.error("Slack Error:", error);
-    return false;
+    console.error("Failed to queue notifications:", error);
   }
 }

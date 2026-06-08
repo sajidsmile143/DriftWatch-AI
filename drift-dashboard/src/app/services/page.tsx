@@ -29,7 +29,13 @@ export default function ServicesPage() {
     fetch("/api/services")
       .then(res => res.json())
       .then(data => {
-        setBaselines(data);
+        // Robust array validation
+        setBaselines(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error loading services:", err);
+        setBaselines([]);
         setLoading(false);
       });
   }, []);
@@ -107,7 +113,7 @@ export default function ServicesPage() {
           <div className="p-20 bg-white/[0.02] border border-white/5 border-dashed rounded-[3rem] text-center">
             <FileJson className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-20" />
             <h3 className="text-2xl font-bold italic opacity-50">Catalogue Empty</h3>
-            <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">Deploy the DriftWatch SDK to begin indexing your API contracts automatically.</p>
+            <p className="text-muted-foreground max-w-xs mx-auto mt-2 text-sm">Deploy the Driftly SDK to begin indexing your API contracts automatically.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-12">

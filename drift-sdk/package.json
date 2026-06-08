@@ -1,13 +1,34 @@
 {
-  "name": "drift-sdk",
+  "name": "@sajidbhatti/driftly",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Real-time API Drift Detection & Monitoring for Frontend applications. (Driftly)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "api",
+    "drift",
+    "monitoring",
+    "schema",
+    "detection",
+    "driftwatch",
+    "driftly"
+  ],
+  "author": "Sajid Bhatti",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sajidsmile143/DriftWatch-AI.git"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
 }

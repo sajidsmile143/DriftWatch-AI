@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DriftWatch AI | Real-time API Drift Detection",
-  description: "Monitor, detect and prevent frontend crashes caused by API drifting.",
+  title: "Driftly | Real-time API Drift Detection",
+  description: "Monitor, detect and prevent frontend crashes caused by API drifting with AI.",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-background text-foreground flex antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-background text-foreground flex antialiased`} suppressHydrationWarning>
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
           {children}

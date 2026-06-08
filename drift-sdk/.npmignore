@@ -1,0 +1,18 @@
+# Source files
+index.ts
+tsconfig.json
+
+# Tooling
+node_modules
+.npmrc
+*.log
+
+# Scripts
+test-drift.ts
+test-key.ts
+
+# Folders
+.next
+.git
+src
+public
