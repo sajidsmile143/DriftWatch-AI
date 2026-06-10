@@ -25,16 +25,17 @@ npm install @msajidbhatti/driftly
 
 ## 🚀 Quick Start
 
-Initialize the SDK at the root of your application (e.g., `_app.tsx` or `layout.tsx`).
+1. Go to the live **[Driftly Dashboard](https://driftly-steel.vercel.app/)** to get your **Project API Key**.
+2. Initialize the SDK at the root of your application (e.g., `main.tsx`, `App.tsx`, `_app.tsx` or `layout.tsx`).
 
 ```typescript
 import { initDriftly } from '@msajidbhatti/driftly';
 
 initDriftly({
-  monitorUrl: 'https://your-driftly-dashboard.com/api/monitor',
-  apiKey: 'YOUR_PROJECT_API_KEY',
+  monitorUrl: 'https://driftly-steel.vercel.app/api/monitor', // Live Dashboard endpoint
+  apiKey: 'YOUR_PROJECT_API_KEY',                            // Found in your Dashboard settings
   serviceName: 'Frontend-Main-App',
-  enabled: process.env.NODE_ENV === 'production', // Only run in production
+  enabled: true,                                               // Toggle monitoring on/off
   debug: true
 });
 ```

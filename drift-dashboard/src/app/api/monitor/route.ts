@@ -53,17 +53,38 @@ export async function GET() {
 }
 
 
+// Helper for adding CORS headers to JSON responses
+function corsResponse(data: any, init?: ResponseInit) {
+  const response = NextResponse.json(data, init);
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-driftly-api-key");
+  return response;
+}
+
+// OPTIONS: Handle CORS Preflight Requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, x-driftly-api-key",
+    },
+  });
+}
+
 // POST: SDK endpoint (Public, identifies via API Key)
 export async function POST(req: Request) {
   try {
     const apiKey = req.headers.get("x-driftly-api-key");
-    if (!apiKey) return NextResponse.json({ error: "API Key Required" }, { status: 401 });
+    if (!apiKey) return corsResponse({ error: "API Key Required" }, { status: 401 });
 
     const project = await prisma.project.findUnique({
       where: { apiKey }
     });
 
-    if (!project) return NextResponse.json({ error: "Invalid API Key" }, { status: 401 });
+    if (!project) return corsResponse({ error: "Invalid API Key" }, { status: 401 });
 
     const body = await req.json();
     const { serviceName, url, method, body: currentData, timestamp } = body;
@@ -125,7 +146,7 @@ export async function POST(req: Request) {
       timestamp: report.timestamp.toString()
     };
 
-    return NextResponse.json({ 
+    return corsResponse({ 
       success: true, 
       status: driftStatus.type,
       message: driftStatus.message,
@@ -133,6 +154,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Monitor POST Error:", error);
-    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
+    return corsResponse({ error: "Internal Error" }, { status: 500 });
   }
 }
