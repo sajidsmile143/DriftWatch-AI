@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DashboardHeader } from "@/components/DashboardHeader";
-import { Code2, Copy, Check, Terminal, Key, ShieldCheck, Loader2 } from "lucide-react";
+import { Code2, Copy, Check, Terminal, Key, ShieldCheck, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function SDKPage() {
   const [snippetCopied, setSnippetCopied] = useState(false);
@@ -10,6 +10,7 @@ export default function SDKPage() {
   const [keyCopied, setKeyCopied] = useState(false);
   const [apiKey, setApiKey] = useState<string>("LOADING_KEY...");
   const [loading, setLoading] = useState(true);
+  const [showKey, setShowKey] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -22,7 +23,7 @@ export default function SDKPage() {
   }, []);
 
   const codeSnippet = `// 1. Initialize Driftly in your App entry point (e.g., layout.tsx)
-import { initDriftly } from "@msajidbhatti/driftly";
+import { initDriftly } from "driftly-sdk";
 
 initDriftly({
   monitorUrl: "${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/api/monitor",
@@ -48,7 +49,7 @@ initDriftly({
           </div>
           <div>
             <h2 className="text-3xl font-bold tracking-tighter text-white">Installation Guide</h2>
-            <p className="text-muted-foreground text-sm font-medium">Follow these steps to connect your frontend orbit to Driftly Cloud.</p>
+            <p className="text-muted-foreground text-sm font-medium">Follow these steps to connect your frontend application to Driftly.</p>
           </div>
         </div>
 
@@ -62,14 +63,14 @@ initDriftly({
               </div>
               <div 
                 onClick={() => {
-                  navigator.clipboard.writeText("npm install @msajidbhatti/driftly");
+                  navigator.clipboard.writeText("npm install driftly-sdk");
                   setInstallCopied(true);
                   setTimeout(() => setInstallCopied(false), 2000);
                 }}
                 className="p-6 bg-white/[0.03] backdrop-blur-3xl border border-white/5 rounded-[2rem] font-mono text-sm flex items-center justify-between group cursor-pointer hover:border-primary/30 transition-all"
               >
                 <span className="text-white/60">
-                  <span className="text-primary font-bold">npm install</span> @msajidbhatti/driftly
+                  <span className="text-primary font-bold">npm install</span> driftly-sdk
                 </span>
                 <div className="p-2 bg-white/5 rounded-lg opacity-50 group-hover:opacity-100 transition-all">
                   {installCopied ? (
@@ -126,9 +127,18 @@ initDriftly({
 
           <div className="space-y-8">
              <div className="p-8 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-[2.5rem] space-y-6">
-                <div className="flex items-center gap-3">
-                   <Key className="w-5 h-5 text-primary" />
-                   <h4 className="font-bold text-sm uppercase tracking-widest">Your API Key</h4>
+                <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <Key className="w-5 h-5 text-primary" />
+                      <h4 className="font-bold text-sm uppercase tracking-widest">Your API Key</h4>
+                   </div>
+                   <button 
+                     onClick={() => setShowKey(!showKey)}
+                     className="p-2 hover:bg-white/5 rounded-xl text-white/40 hover:text-white transition-colors"
+                     title={showKey ? "Hide API Key" : "Show API Key"}
+                   >
+                     {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                   </button>
                 </div>
                 <div 
                   onClick={() => {
@@ -136,9 +146,12 @@ initDriftly({
                     setKeyCopied(true);
                     setTimeout(() => setKeyCopied(false), 2000);
                   }}
-                  className="p-4 bg-black/40 border border-white/5 rounded-2xl font-mono text-[11px] break-all text-white/80 select-all cursor-pointer hover:bg-white/5 transition-colors relative group/key"
+                  className="p-4 bg-black/40 border border-white/5 rounded-2xl font-mono text-[11px] break-all text-white/80 cursor-pointer hover:bg-white/5 transition-colors relative group/key flex items-center justify-between"
                 >
-                   {apiKey}
+                   <span>
+                      {showKey ? apiKey : apiKey.substring(0, 3) + "•".repeat(12)}
+                   </span>
+                   <span className="text-[9px] font-black uppercase tracking-wider text-primary opacity-0 group-hover/key:opacity-100 transition-opacity ml-2">Copy</span>
                    {keyCopied && (
                      <div className="absolute inset-0 bg-primary/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-[10px] font-bold text-primary animate-in fade-in zoom-in duration-200">
                        COPIED!
@@ -146,7 +159,7 @@ initDriftly({
                    )}
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed font-medium">
-                  Keep this key secret. It identifies your project orbits and ensures data isolation in the Driftly cloud.
+                  Keep this key secret. It identifies your project and ensures data isolation in the Driftly cloud.
                 </p>
              </div>
 

@@ -103,7 +103,7 @@ export default function DriftsPage() {
               transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
               className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full"
             />
-            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Scanning frequencies...</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Loading drifts...</span>
           </div>
         ) : reports.length === 0 ? (
           <motion.div 
@@ -114,9 +114,9 @@ export default function DriftsPage() {
             <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <History className="w-10 h-10 text-emerald-500" />
             </div>
-            <h3 className="text-2xl font-bold">Systems Stable</h3>
+            <h3 className="text-2xl font-bold">System Stable</h3>
             <p className="text-muted-foreground max-w-sm mx-auto mt-2 text-sm leading-relaxed">
-              Driftly is currently in orbit. No API schema changes detected across your microservices.
+              No API schema changes detected across your microservices.
             </p>
           </motion.div>
         ) : (

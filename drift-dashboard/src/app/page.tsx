@@ -112,10 +112,6 @@ export default function Home() {
                 <h2 className="text-2xl font-bold tracking-tight">System Health</h2>
                 <p className="text-sm text-muted-foreground mt-1">Real-time monitoring of all microservices</p>
               </div>
-              <Link href="/services" className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-full font-semibold hover:scale-105 transition-all shadow-xl shadow-primary/20 active:scale-95">
-                <Plus className="w-4 h-4" />
-                Add Service
-              </Link>
             </div>
             
             <div className="bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
@@ -124,7 +120,6 @@ export default function Home() {
                   <thead className="bg-white/[0.03] border-b border-white/5">
                     <tr>
                       <th className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Endpoint</th>
-                      <th className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Baseline</th>
                       <th className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-muted-foreground/50">Reliability</th>
                       <th className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-muted-foreground/50 text-right">Action</th>
                     </tr>
@@ -133,7 +128,7 @@ export default function Home() {
                     <AnimatePresence mode="popLayout">
                       {services.length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="px-8 py-20 text-center text-muted-foreground italic">
+                          <td colSpan={3} className="px-8 py-20 text-center text-muted-foreground italic">
                             No active monitors. Use the drift-sdk to start tracking.
                           </td>
                         </tr>
@@ -153,9 +148,6 @@ export default function Home() {
                                   <span className="font-semibold text-sm group-hover:text-primary transition-colors">{service.url.split('/').pop()}</span>
                                   <span className="text-[10px] text-muted-foreground font-mono mt-1 opacity-50">{service.url}</span>
                                 </div>
-                              </td>
-                              <td className="px-8 py-6">
-                                <span className="text-xs font-mono bg-white/5 px-2 py-1 rounded text-blue-400">Captured</span>
                               </td>
                               <td className="px-8 py-6">
                                 <span className={cn(
@@ -193,7 +185,7 @@ export default function Home() {
                 <AnimatePresence mode="popLayout">
                   {reports.length === 0 ? (
                     <div className="h-full flex items-center justify-center text-center p-8">
-                       <p className="text-sm text-muted-foreground italic">Listening for heartbeats...</p>
+                       <p className="text-sm text-muted-foreground italic">Waiting for API requests...</p>
                     </div>
                   ) : (
                     reports.slice(0, 10).map((report, i) => (

@@ -66,7 +66,7 @@ export default function SettingsPage() {
         method: "POST",
         body: JSON.stringify(settings),
       });
-      setToast({ show: true, message: "Configuration orbitally updated! ✨" });
+      setToast({ show: true, message: "Settings saved successfully! ✨" });
     } catch (err) {
       console.error(err);
       setToast({ show: true, message: "Sync failed. Check terminal." });
@@ -91,7 +91,7 @@ export default function SettingsPage() {
             <Settings2 className="w-8 h-8 text-primary" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold tracking-tighter">Unified Hub</h2>
+            <h2 className="text-3xl font-bold tracking-tighter">Project Settings</h2>
             <p className="text-muted-foreground text-sm font-medium">Configure multi-channel alerts and AI intelligence parameters.</p>
           </div>
         </div>
@@ -104,40 +104,15 @@ export default function SettingsPage() {
               <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/50">Alert gateways</h3>
             </div>
 
-
-
-            {/* Slack Webhook */}
-            <motion.section 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="p-8 bg-white/[0.03] backdrop-blur-3xl border border-white/5 rounded-[2.5rem] space-y-6 group hover:border-purple-500/20 transition-all shadow-2xl"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                  <Hash className="w-5 h-5 text-purple-500" />
-                </div>
-                <h3 className="font-bold text-lg">Slack Webhook</h3>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Webhook URL</label>
-                <div className="relative">
-                  <Fingerprint className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/30" />
-                  <input 
-                    type="text" 
-                    placeholder="https://hooks.slack.com/services/..."
-                    value={settings.slackWebhook}
-                    onChange={e => setSettings({...settings, slackWebhook: e.target.value})}
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl pl-12 pr-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 transition-all font-mono"
-                  />
-                </div>
-              </div>
-            </motion.section>
-
+            {/* WhatsApp Alerts are directly configured below */}
             {isAdmin && <WhatsAppBridge defaultPhone={settings.whatsappNumber} />}
+          </div>
 
-
+          <div className="space-y-8">
+            <div className="flex items-center gap-2 px-2">
+              <Cpu className="w-5 h-5 text-indigo-500" />
+              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/50">System control</h3>
+            </div>
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 px-2">
@@ -156,20 +131,12 @@ export default function SettingsPage() {
                  <p className="text-[11px] text-white/30 mt-3 px-1 leading-relaxed">System will route all critical drift alerts to this number via the bridge session above.</p>
               </div>
             </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="flex items-center gap-2 px-2">
-              <Cpu className="w-5 h-5 text-indigo-500" />
-              <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground/50">System control</h3>
-            </div>
-
 
             {/* Global Controls */}
             <div className="p-8 bg-gradient-to-br from-primary/10 to-transparent backdrop-blur-xl border border-primary/20 rounded-[2.5rem] flex flex-col justify-between h-[210px] shadow-2xl shadow-primary/5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-xl font-black tracking-tight text-primary">Orbital Status</h4>
+                  <h4 className="text-xl font-black tracking-tight text-primary">Monitoring Status</h4>
                   <p className="text-xs text-white/40 font-medium">Global monitoring state</p>
                 </div>
                 <div className={cn(
@@ -193,7 +160,7 @@ export default function SettingsPage() {
                 ) : (
                   <Save className="w-5 h-5" />
                 )}
-                Commit Config
+                Save Config
               </button>
             </div>
           </div>

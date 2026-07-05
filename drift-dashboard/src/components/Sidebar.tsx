@@ -87,7 +87,6 @@ export function Sidebar() {
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[11px] font-bold truncate text-foreground">{user.email}</span>
-                <span className="text-[9px] font-black uppercase tracking-tighter text-primary">Pro Account</span>
               </div>
             </div>
             <button 

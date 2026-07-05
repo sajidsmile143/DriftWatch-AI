@@ -18,7 +18,7 @@
 ## 📦 Installation
 
 ```bash
-npm install @msajidbhatti/driftly
+npm install driftly-sdk
 ```
 
 ---
@@ -29,7 +29,7 @@ npm install @msajidbhatti/driftly
 2. Initialize the SDK at the root of your application (e.g., `main.tsx`, `App.tsx`, `_app.tsx` or `layout.tsx`).
 
 ```typescript
-import { initDriftly } from '@msajidbhatti/driftly';
+import { initDriftly } from 'driftly-sdk';
 
 initDriftly({
   monitorUrl: 'https://driftly-steel.vercel.app/api/monitor', // Live Dashboard endpoint
